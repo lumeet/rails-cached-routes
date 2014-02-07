@@ -24,7 +24,7 @@ module CachedRoutes
       new_routes.map! do |route|
         if ActionDispatch::Routing::Redirect === route.app
           route = route.clone
-          route.instance_variable_set :@app, route.app.path({}, nil)
+          route.instance_variable_set :@app, CachedRedirect.new(route.app)
         end
         route
       end
@@ -35,11 +35,10 @@ module CachedRoutes
     end
 
     def unmarshal_routes(routes)
-      redirect_builder = Class.new { include ActionDispatch::Routing::Redirection }.new
       File.open(cached_file, 'rb') do |io|
         Marshal.load(io).each do |route|
-          if String === route.app
-            route.instance_variable_set :@app, redirect_builder.redirect(route.app)
+          if CachedRedirect === route.app
+            route.instance_variable_set :@app, route.app.to_action_dispatch_redirect
           end
           routes << route
         end
