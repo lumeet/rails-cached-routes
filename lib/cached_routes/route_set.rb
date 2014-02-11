@@ -8,7 +8,7 @@ module CachedRoutes
     def draw_with_caching(*args, &block)
       marshaller = Marshaller.new
       if marshaller.can_unmarshal_routes?
-        marshaller.unmarshal_routes(self.set.routes)
+        marshaller.unmarshal_routes(self.set.routes, self.named_routes)
       else
         routes_before = self.set.routes.clone
         draw_without_caching(*args, &block)

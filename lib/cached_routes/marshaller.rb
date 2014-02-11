@@ -34,13 +34,14 @@ module CachedRoutes
       nil
     end
 
-    def unmarshal_routes(routes)
+    def unmarshal_routes(routes, named_routes)
       File.open(cached_file, 'rb') do |io|
         Marshal.load(io).each do |route|
           if CachedRedirect === route.app
             route.instance_variable_set :@app, route.app.to_action_dispatch_redirect
           end
           routes << route
+          named_routes[route.name] = route if route.name
         end
       end
     end
