@@ -6,8 +6,7 @@ module CachedRoutes
     include ActionDispatch::Routing::Redirection
 
     def initialize(ad_redirect)
-      @path = case ad_redirect
-              when ActionDispatch::Routing::Redirect
+      @path = if ad_redirect.instance_of?(ActionDispatch::Routing::Redirect)
                 ad_redirect.path({}, nil)
               else
                 ad_redirect
@@ -15,7 +14,7 @@ module CachedRoutes
     end
 
     def to_action_dispatch_redirect
-      redirect(@path)
+      @path.is_a?(String) ? redirect(@path) : @path
     end
 
   end
